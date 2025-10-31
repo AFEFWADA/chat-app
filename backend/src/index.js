@@ -18,13 +18,14 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-     origin: [
-      "http://localhost:5173", // for local dev
-      "https://chat-app-67cw.vercel.app", // ✅ your deployed frontend URL
+    origin: [
+      "http://localhost:5173", // local dev
+      "https://chat-app-67cw.vercel.app", // deployed frontend
     ],
-    credentials: true,
+    credentials: true, // ✅ allow cookies
   })
 );
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
