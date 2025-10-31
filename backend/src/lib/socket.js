@@ -5,38 +5,36 @@ import express from "express";
 const app = express();
 const server = http.createServer(app);
 
-// Store online users
-const userSocketMap = {}; // { userId: socketId }
-
-// ✅ Allow both local and deployed frontend URLs
 const io = new Server(server, {
   cors: {
     origin: [
-      "http://localhost:5173", // local dev
-      "https://chat-app-67cw.vercel.app", // ✅ your deployed frontend
+      "http://localhost:5173",
+      "https://chat-app-67cw.vercel.app",
     ],
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
-// ✅ Helper function to get receiver socket ID
+
 export function getReceiverSocketId(userId) {
   return userSocketMap[userId];
 }
 
-// ✅ Socket.io event handlers
+// used to store online users
+const userSocketMap = {}; // {userId: socketId}
+
 io.on("connection", (socket) => {
-  console.log("A user connected:", socket.id);
+  console.log("A user connected", socket.id);
 
   const userId = socket.handshake.query.userId;
   if (userId) userSocketMap[userId] = socket.id;
 
-  // Send list of online users to all clients
+  // io.emit() is used to send events to all the connected clients
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
   socket.on("disconnect", () => {
-    console.log("A user disconnected:", socket.id);
+    console.log("A user disconnected", socket.id);
     delete userSocketMap[userId];
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
